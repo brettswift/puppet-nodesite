@@ -11,8 +11,4 @@ class nodesite::packages{
     ensure => latest,
   }
 
-  service { "iptables":
-      enable => false,
-    ensure => stopped,
-  }
 }

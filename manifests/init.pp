@@ -2,22 +2,22 @@
 
 # TODO: move defaults to nodesite.params, and load defaults
 class nodesite (
-    $gitUri 			= {},
-    $gitBranch 		= {},
-    $nodeVersion 	= {},
-    $fileToRun 		= {},
+    $git_uri 			= {},
+    $git_branch 		= {},
+    $node_version 	= {},
+    $file_to_run 		= {},
     $user         = {},
-    $npmProxy     = {},
+    $npm_proxy     = {},
 ){
 
 	include nodesite::packages
   
 	# TODO: include plain class, and pull variables instead of pushing.  use module_data / hiera? 
 	class {'nodesite::project':
-			gitUri 			=> $gitUri,
-			gitBranch 	=> $gitBranch,
-			fileToRun 	=> $fileToRun,
-			nodeVersion	=> $nodeVersion,
+			git_uri 			=> $git_uri,
+			git_branch 	=> $git_branch,
+			file_to_run 	=> $file_to_run,
+			node_version	=> $node_version,
       user        => $user,
 	}
 	

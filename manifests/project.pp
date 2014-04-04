@@ -1,18 +1,17 @@
 class nodesite::project(
-		$gitUri 	 		= {},
-		$gitBranch		= 'master',
-		$fileToRun 		= 'app.js',
-		$nodeVersion 	= {},
+		$git_uri 	 		= {},
+		$git_branch		= 'master',
+		$file_to_run	= 'app.js',
+		$node_version = {},
 		$user					= {},
-		$npmProxy			= {},
+		$npm_proxy		= {},
 	){
-	# require nodesite::nvm
 
-	$projectDir = "/tmp/gitProjects"
+	$nodesite_dir = "/usr/local/share/notesite_git_projects"
 	# regex to get project name, used in folder
-	$projectNameDirty = regsubst($gitUri, '^(.*[\\\/])', '')
-	$projectName = regsubst($projectNameDirty, '.git', '')
-	$projectDir_cwd = "$projectDir/${projectName}"
+	$project_name_dirty = regsubst($git_uri, '^(.*[\\\/])', '')
+	$project_name = regsubst($project_name_dirty, '.git', '')
+	$project_dir = "$nodesite_dir/${project_name}"
 	
 	#defaults
 	Class{ user => $user }
@@ -21,71 +20,77 @@ class nodesite::project(
 
 	class { 'nvm_nodejs':
   	user    => $user,
-  	version => $nodeVersion,
+  	version => $node_version,
 	}
 
-	file { "${projectDir}":
+	file { "${nodesite_dir}":
 		ensure => directory,
 	}
 
 	exec { "cloneProject":
-		command => "/usr/bin/git clone --depth 1 $gitUri  &>>${projectName}.log",
-		cwd			=> "/tmp/gitProjects",
-		creates => "/tmp/gitProjects/${projectName}.log",
+		command => "/usr/bin/git clone --depth 1 $git_uri  &>>${project_name}_gitclone.log",
+		cwd			=> "${$nodesite_dir}",
+		creates => "${$nodesite_dir}/${project_name}_gitclone.log",
 	}
 
-	exec { "gitBranch":
-		command => "/usr/bin/git checkout ${gitBranch}",
-		cwd			=> $projectDir_cwd,
+	exec { "git_branch":
+		command => "/usr/bin/git checkout ${git_branch}",
+		cwd			=> $project_dir,
 		# TODO: notify npm purge exec.
 	}
 
 	exec { "pullProject":
-		command => "/usr/bin/git pull origin ${gitBranch}",
-		cwd			=> $projectDir_cwd,
+		command => "/usr/bin/git pull origin ${git_branch}",
+		cwd			=> $project_dir,
 	}
 
 	exec { "setNpmProxy": 
-		command 		=> "$nvm_nodejs::NPM_EXEC config set https-proxy $npmProxy; $nvm_nodejs::NPM_EXEC config set proxy ${npmProxy}",
+		command 		=> "$nvm_nodejs::NPM_EXEC config set https-proxy $npm_proxy; $nvm_nodejs::NPM_EXEC config set proxy ${npm_proxy}",
 		onlyif			=> "/bin/echo $http_proxy",
 		user 				=> 'root',
 	}
 
+	#TODO take deployment commands from package.json, not just npm install.
 	exec { "npmInstall":
 		command => "$nvm_nodejs::NPM_EXEC install",
-		cwd			=> $projectDir_cwd,
+		cwd			=> $project_dir,
 	}
-
-	# TODO: change to service - create init.d service template? use "forever"? 
-	# exec { "runProject":
-	# 	command => "$nvm_nodejs::NODE_EXEC $fileToRun &",
-	# 	cwd			=> $projectDir_cwd,
-	# 	user 		=> $user,
+	# init.d
+	# file {"/etc/init.d/${project_name}":
+ #    content => template('nodesite/init.d.erb'),
+ #    mode 		=> 0755,
 	# }
-
-	file {"/etc/init.d/${projectName}":
-    content => template('nodesite/init.d.erb'),
-    mode 		=> 0755,
+	#upstart
+	file {"/etc/init/${project_name}.conf":
+    content => template('nodesite/init.conf.erb'),
+    mode 		=> 0644,
 	}
 
-	service { "${projectName}" :
-		ensure => running,
+	service { "${project_name}" :
+		ensure 		=> running,
+		provider 	=> upstart,
 	}
+
+	service { "iptables":
+    enable => false,
+    ensure => stopped,
+  }
 
  	Class['nvm_nodejs'] -> 
-	File['/tmp/gitProjects'] -> 
+	File["${nodesite_dir}"] -> 
 	Exec['cloneProject'] -> 
-	Exec['gitBranch'] -> 
+	Exec['git_branch'] -> 
 	Exec['pullProject'] -> 
 	Exec['npmInstall'] -> 
 	# Exec['runProject'] -> 
-	File["/etc/init.d/${projectName}"]-> 
-	Service["${projectName}"]
+	File["/etc/init/${project_name}.conf"]-> 
+	# File["/etc/init.d/${project_name}"]-> 
+	Service["${project_name}"]
 	
 	$node_executable = $nvm_nodejs::NODE_EXEC
 
-	info("##### ---------------->>> git URI:    $gitUri")
-	info("##### ---------------->>> project name:    $projectName")
+	info("##### ---------------->>> git URI:    $git_uri")
+	info("##### ---------------->>> project name:    $project_name")
 	info("node exe: $nvm_nodejs::NODE_EXEC")
 
 }

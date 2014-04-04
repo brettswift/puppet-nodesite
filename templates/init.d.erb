@@ -1,9 +1,9 @@
 #!/bin/sh
 
 NODE_ENV="production"
-NODE_APP='<%=@fileToRun%>'
-APP_DIR='<%=@projectDir%>/<%=@projectName%>';
-PID_FILE=$APP_DIR/app.pid
+NODE_APP='<%=@file_to_run%>'
+APP_DIR='<%=@nodesite_dir%>/<%=@project_name%>';
+PID_FILE=/var/run/nodesite_<%=@project_name%>.pid
 LOG_FILE=$APP_DIR/app.log
 CONFIG_DIR=$APP_DIR/config
 #PORT=3000
@@ -14,15 +14,15 @@ NODE_EXEC="<%= scope.lookupvar('nvm_nodejs::NODE_EXEC') %>"
 # REDHAT chkconfig header
 
 # chkconfig: - 58 74
-# description: node-app is the script for starting a node app on boot.
+# description: <%=@project_name%> is the script for starting a node app on boot.
 ### BEGIN INIT INFO
 # Provides: node
 # Required-Start:    $network $remote_fs $local_fs
 # Required-Stop:     $network $remote_fs $local_fs
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: start and stop node
-# Description: Node process for app
+# Short-Description: start and stop nodejs project: <%=@project_name%>
+# Description: Node process for $APP_DIR
 ### END INIT INFO
 
 start_app (){
@@ -31,7 +31,8 @@ start_app (){
         echo "$PID_FILE exists, process is already running or crashed"
         exit 1
     else
-        echo "Starting node app..."
+        echo "Starting <%=@project_name%> app..."
+        #TODO test functionality for port
         #PORT=$PORT 
         NODE_ENV=$NODE_ENV NODE_CONFIG_DIR=$CONFIG_DIR $NODE_EXEC $APP_DIR/$NODE_APP  1>$LOG_FILE 2>&1 &
         echo $! > $PID_FILE;
@@ -48,7 +49,7 @@ stop_app (){
         echo "Killing `cat $PID_FILE`"
         kill `cat $PID_FILE`;
         rm -f $PID_FILE;
-        echo "Node stopped"
+        echo "<%=@project_name%> stopped"
     fi
 }
 
@@ -65,26 +66,24 @@ case "$1" in
         stop_app
         start_app
     ;;
-#1   program is dead and /var/run pid file exists
-#2   program is dead and /var/lock lock file exists
-#3   program is not running
 
     status)
-        if [ -f $PID_FILE ]
-        then
-            PID=`cat $PID_FILE`
-            if [ -z "`ps ef | awk '{print $1}' | grep "^$PID$"`" ]
-            then
-                echo "Node app stopped but pid file exists"
-                exit 1
-            else
-                echo "Node app running with pid $PID"
-                exit 0
-            fi
+           
+     if [ -f $PID_FILE ]; then
+        echo "pid file exists"
+        PID=`cat $PID_FILE`
+        if [  -z "`ps axf | grep ${PID} | grep -v grep`"  ]; then
+            echo "Node app stopped but pid file exists. Removing pid: $PID"
+            rm -f $PID_FILE
+            exit 1
         else
-            echo "Node app stopped"
-            exit 3
+            echo "Node app running with pid $PID"
+            exit 0
         fi
+    else
+        echo "Node app stopped"
+        exit 3
+    fi
     ;;
 
     *)
