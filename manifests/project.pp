@@ -12,12 +12,12 @@ class nodesite::project(
 	# regex to get project name, used in folder
 	$projectNameDirty = regsubst($gitUri, '^(.*[\\\/])', '')
 	$projectName = regsubst($projectNameDirty, '.git', '')
-	$projectDir_cwd = "$projectDir/$projectName"
+	$projectDir_cwd = "$projectDir/${projectName}"
 	
 	#defaults
 	Class{ user => $user }
 	Exec{ user => $user	}
-	File{ user => $user	}
+	File{ owner => $user	}
 
 	class { 'nvm_nodejs':
   	user    => $user,
@@ -29,25 +29,26 @@ class nodesite::project(
 	}
 
 	exec { "cloneProject":
-		command => "/usr/bin/git clone --depth 1 $gitUri  &>>$projectName.log",
+		command => "/usr/bin/git clone --depth 1 $gitUri  &>>${projectName}.log",
 		cwd			=> "/tmp/gitProjects",
-		creates => "/tmp/gitProjects/$projectName.log",
+		creates => "/tmp/gitProjects/${projectName}.log",
 	}
 
 	exec { "gitBranch":
-		command => "/usr/bin/git checkout $gitBranch",
+		command => "/usr/bin/git checkout ${gitBranch}",
 		cwd			=> $projectDir_cwd,
 		# TODO: notify npm purge exec.
 	}
 
 	exec { "pullProject":
-		command => "/usr/bin/git pull origin $gitBranch",
+		command => "/usr/bin/git pull origin ${gitBranch}",
 		cwd			=> $projectDir_cwd,
 	}
 
 	exec { "setNpmProxy": 
-		command 		=> "$nvm_nodejs::NPM_EXEC config set https-proxy $npmProxy; $nvm_nodejs::NPM_EXEC config set proxy $npmProxy",
+		command 		=> "$nvm_nodejs::NPM_EXEC config set https-proxy $npmProxy; $nvm_nodejs::NPM_EXEC config set proxy ${npmProxy}",
 		onlyif			=> "/bin/echo $http_proxy",
+		user 				=> 'root',
 	}
 
 	exec { "npmInstall":
@@ -62,12 +63,12 @@ class nodesite::project(
 	# 	user 		=> $user,
 	# }
 
-	file {"/etc/init.d/$projectName":
+	file {"/etc/init.d/${projectName}":
     content => template('nodesite/init.d.erb'),
     mode 		=> 0755,
 	}
 
-	service{"$projectName":
+	service { "${projectName}" :
 		ensure => running,
 	}
 
@@ -78,8 +79,8 @@ class nodesite::project(
 	Exec['pullProject'] -> 
 	Exec['npmInstall'] -> 
 	# Exec['runProject'] -> 
-	File["/etc/init.d/$projectName"]-> 
-	Service["$projectName"]
+	File["/etc/init.d/${projectName}"]-> 
+	Service["${projectName}"]
 	
 	$node_executable = $nvm_nodejs::NODE_EXEC
 
