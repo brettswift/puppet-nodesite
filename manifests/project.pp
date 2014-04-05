@@ -60,16 +60,28 @@ class nodesite::project(
  #    content => template('nodesite/init.d.erb'),
  #    mode 		=> 0755,
 	# }
-	#upstart
+
+	#upstart only works on puppet 3.5+ 
 	file {"/etc/init/${project_name}.conf":
     content => template('nodesite/init.conf.erb'),
     mode 		=> 0644,
 	}
 
-	service { "${project_name}" :
-		ensure 		=> running,
-		provider 	=> upstart,
-	}
+	#this only works in puppet 3.5
+	# service { "${project_name}" :
+	# 	ensure 		=> running,
+	# 	provider 	=> upstart,
+	# }
+
+	#puppet <3.5 requires more verbose configuration
+	 service { "${project_name}":
+    ensure    => 'running',
+    hasstatus => false,
+    pattern   => "${project_name}/${file_to_run}",
+    restart   => "/sbin/restart ${project_name}",
+    start     => "/sbin/start ${project_name}",
+    stop      => "/sbin/stop ${project_name}",
+  }
 
 	service { "iptables":
     enable => false,
