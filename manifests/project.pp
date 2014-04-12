@@ -25,10 +25,13 @@ class nodesite::project(
   	version => $node_version,
 	}
 
-	exec { "setNpmProxy": 
-		command 		=> "$nvm_nodejs::NPM_EXEC config set https-proxy $npm_proxy; $nvm_nodejs::NPM_EXEC config set proxy ${npm_proxy}",
-		onlyif			=> "/bin/echo $http_proxy",
-		user 				=> 'root',
+	if($npm_proxy){
+		exec { "setNpmProxy": 
+			command 		=> "$nvm_nodejs::NPM_EXEC config set https-proxy $npm_proxy; $nvm_nodejs::NPM_EXEC config set proxy ${npm_proxy}",
+			onlyif			=> "/bin/echo $http_proxy",
+			user 				=> 'root',
+			notify 			=> Exec['npmInstall'],
+		}
 	}
 
 	#TODO take deployment commands from package.json, not just npm install.
@@ -77,23 +80,10 @@ class nodesite::project(
 		Service["${project_name}"]
 	}
 
-	#puppet <3.5 requires more verbose configuration
-	 # service { "${project_name}":
-  #   ensure    => 'running',
-  #   hasstatus => false,
-  #   pattern   => "${project_name}/${file_to_run}",
-  #   restart   => "/sbin/restart ${project_name}",
-  #   start     => "/sbin/start ${project_name}",
-  #   stop      => "/sbin/stop ${project_name}",
-  # }
-
 	service { "iptables":
     enable => false,
     ensure => stopped,
   }
-
- 	Class['nvm_nodejs'] -> 
-	Exec['npmInstall']
 	
 	info("Configuring project name:    $project_name")
 	info("Using node exe: $nvm_nodejs::NODE_EXEC")
