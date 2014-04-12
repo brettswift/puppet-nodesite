@@ -2,7 +2,7 @@
 
 NODE_ENV="production"
 NODE_APP='<%=@file_to_run%>'
-APP_DIR='<%=@nodesite_dir%>/<%=@project_name%>';
+APP_DIR='<%=@repo_dir%>/<%=@project_name%>';
 PID_FILE=/var/run/nodesite_<%=@project_name%>.pid
 LOG_FILE=$APP_DIR/app.log
 CONFIG_DIR=$APP_DIR/config

@@ -11,20 +11,14 @@ class nodesite (
     $repo_dir       = 'module_default',
 ){
 
-	include nodesite::packages
+  include nodesite::packages
+	include nodesite::git
   include nodesite::project
 
-	# TODO: include plain class, and pull variables instead of pushing.  use module_data / hiera? 
-	# class {'nodesite::project':
-	# 		git_uri 			=> $git_uri,
-	# 		git_branch 	=> $git_branch,
-	# 		file_to_run 	=> $file_to_run,
-	# 		node_version	=> $node_version,
- #      user        => $user,
-	# }
-	
-  # Class['nvm'] -> 
+
+
   Class['nodesite::packages'] ->
+  Class['nodesite::git'] ->
   Class['nodesite::project']
 
 }

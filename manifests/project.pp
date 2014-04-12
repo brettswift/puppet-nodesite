@@ -9,10 +9,11 @@ class nodesite::project(
 	){
 
 
-	# regex to get project name, used in folder
-	$project_name_dirty = regsubst($git_uri, '^(.*[\\\/])', '')
-	$project_name = regsubst($project_name_dirty, '.git', '')
-	$project_dir = "$repo_dir/${project_name}"
+	# regex to get project name from uri, used in git and project resources
+  $project_name_dirty = regsubst($git_uri, '^(.*[\\\/])', '')
+  $project_name = regsubst($project_name_dirty, '.git', '')
+  $project_dir = "$repo_dir/${project_name}"
+
 	
 	#defaults
 	Class{ user => $user }
@@ -22,27 +23,6 @@ class nodesite::project(
 	class { 'nvm_nodejs':
   	user    => $user,
   	version => $node_version,
-	}
-
-	file { "${repo_dir}":
-		ensure => directory,
-	}
-
-	exec { "cloneProject":
-		command => "/usr/bin/git clone --depth 1 $git_uri  &>>${project_name}_gitclone.log",
-		cwd			=> "${$repo_dir}",
-		creates => "${$repo_dir}/${project_name}_gitclone.log",
-	}
-
-	exec { "git_branch":
-		command => "/usr/bin/git checkout ${git_branch}",
-		cwd			=> $project_dir,
-		# TODO: notify npm purge exec.
-	}
-
-	exec { "pullProject":
-		command => "/usr/bin/git pull origin ${git_branch}",
-		cwd			=> $project_dir,
 	}
 
 	exec { "setNpmProxy": 
@@ -55,34 +35,45 @@ class nodesite::project(
 	exec { "npmInstall":
 		command => "$nvm_nodejs::NPM_EXEC install",
 		cwd			=> $project_dir,
+		user 		=> 'root', #TODO: not as root. 
 	}
 	# init.d
-	# file {"/etc/init.d/${project_name}":
- #    content => template('nodesite/init.d.erb'),
- #    mode 		=> 0755,
-	# }
-
-	#upstart only works on puppet 3.5+ 
-	file {"/etc/init/${project_name}.conf":
-    content => template('nodesite/init.conf.erb'),
-    mode 		=> 0644,
+	file {"/etc/init.d/${project_name}":
+    content => template('nodesite/init.d.erb'),
+    mode 		=> 0755,
 	}
 
-	#this only works in puppet 3.5
-	# service { "${project_name}" :
-	# 	ensure 		=> running,
-	# 	provider 	=> upstart,
-	# }
+	service {'uptime': 
+		ensure => running,
+	}
+
+# 	major, minor = "{$::puppetversion}".match(/^(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)$/).captures
+
+# 	supports_upstart? = if(major >= 3 && minor >=5)
+
+# if supports_upstart?
+# 	#upstart only works on puppet 3.5+ 
+# 	# file {"/etc/init/${project_name}.conf":
+#  #    content => template('nodesite/init.conf.erb'),
+#  #    mode 		=> 0644,
+# 	# }
+
+# 	#this only works in puppet 3.5
+# 	# service { "${project_name}" :
+# 	# 	ensure 		=> running,
+# 	# 	provider 	=> upstart,
+# 	# }
+# end
 
 	#puppet <3.5 requires more verbose configuration
-	 service { "${project_name}":
-    ensure    => 'running',
-    hasstatus => false,
-    pattern   => "${project_name}/${file_to_run}",
-    restart   => "/sbin/restart ${project_name}",
-    start     => "/sbin/start ${project_name}",
-    stop      => "/sbin/stop ${project_name}",
-  }
+	 # service { "${project_name}":
+  #   ensure    => 'running',
+  #   hasstatus => false,
+  #   pattern   => "${project_name}/${file_to_run}",
+  #   restart   => "/sbin/restart ${project_name}",
+  #   start     => "/sbin/start ${project_name}",
+  #   stop      => "/sbin/stop ${project_name}",
+  # }
 
 	service { "iptables":
     enable => false,
@@ -90,14 +81,10 @@ class nodesite::project(
   }
 
  	Class['nvm_nodejs'] -> 
-	File["${repo_dir}"] -> 
-	Exec['cloneProject'] -> 
-	Exec['git_branch'] -> 
-	Exec['pullProject'] -> 
 	Exec['npmInstall'] -> 
 	# Exec['runProject'] -> 
-	File["/etc/init/${project_name}.conf"]-> 
-	# File["/etc/init.d/${project_name}"]-> 
+	# File["/etc/init/${project_name}.conf"]-> 
+	File["/etc/init.d/${project_name}"]-> 
 	Service["${project_name}"]
 	
 	$node_executable = $nvm_nodejs::NODE_EXEC
