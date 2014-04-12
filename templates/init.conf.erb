@@ -1,6 +1,6 @@
 #!upstart
 description "node.js server"
-author      "brett"
+author      "Brett Swift"
 
 start on startup
 stop on shutdown
@@ -11,14 +11,13 @@ respawn
 
 script
     export HOME="/root"
-	export NODE_EXEC="<%= scope.lookupvar('nvm_nodejs::NODE_EXEC') %>"
-	export APP_DIR='<%=@nodesite_dir%>/<%=@project_name%>'
-	export NODE_ENV=production 
+    export NODE_EXEC="<%= scope.lookupvar('nvm_nodejs::NODE_EXEC') %>"
+    export APP_DIR='<%=@repo_dir%>/<%=@project_name%>'
+    export NODE_ENV=production #TODO: set node_env variable, and other node variables
     export NODE_CONFIG_DIR=$APP_DIR/config
     
     echo $$ > /var/run/<%=@project_name%>.pid
     exec $NODE_EXEC $APP_DIR/<%=@file_to_run%> >> /var/log/<%=@project_name%>.sys.log 2>&1
-    # exec sudo -u username /usr/local/bin/node /where/<%=@file_to_run%>.js >> /var/log/<%=@project_name%>.sys.log 2>&1
 end script
 
 pre-start script

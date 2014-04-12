@@ -37,33 +37,45 @@ class nodesite::project(
 		cwd			=> $project_dir,
 		user 		=> 'root', #TODO: not as root. 
 	}
-	# init.d
-	file {"/etc/init.d/${project_name}":
-    content => template('nodesite/init.d.erb'),
-    mode 		=> 0755,
+
+	if $::puppetversion >= '3.5.0' {
+	  $supports_upstart = true
+	} else {
+	  $supports_upstart = false
 	}
 
-	service {'uptime': 
-		ensure => running,
+	#ugly, but early support for upstart on rhel
+	#TODO: move to service_35.pp and service_34?
+	if $supports_upstart {
+		info("Configuring $project_name with upstart")
+		file {"/etc/init/${project_name}.conf":
+	    content => template('nodesite/init.conf.erb'),
+	    mode 		=> 0644,
+		}
+
+		service { "${project_name}":
+			ensure 		=> running,
+			provider 	=> upstart,
+		}
+
+		File["/etc/init/${project_name}.conf"]-> 
+		Service["${project_name}"]
+
+
+	} else {
+		info("Configuring $project_name with sysv ")
+		file {"/etc/init.d/${project_name}":
+	    content => template('nodesite/init.d.erb'),
+	    mode 		=> 0755,
+		}
+
+		service { "${project_name}": 
+			ensure => running,
+		}
+
+		File["/etc/init.d/${project_name}"]-> 
+		Service["${project_name}"]
 	}
-
-# 	major, minor = "{$::puppetversion}".match(/^(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)$/).captures
-
-# 	supports_upstart? = if(major >= 3 && minor >=5)
-
-# if supports_upstart?
-# 	#upstart only works on puppet 3.5+ 
-# 	# file {"/etc/init/${project_name}.conf":
-#  #    content => template('nodesite/init.conf.erb'),
-#  #    mode 		=> 0644,
-# 	# }
-
-# 	#this only works in puppet 3.5
-# 	# service { "${project_name}" :
-# 	# 	ensure 		=> running,
-# 	# 	provider 	=> upstart,
-# 	# }
-# end
 
 	#puppet <3.5 requires more verbose configuration
 	 # service { "${project_name}":
@@ -81,16 +93,9 @@ class nodesite::project(
   }
 
  	Class['nvm_nodejs'] -> 
-	Exec['npmInstall'] -> 
-	# Exec['runProject'] -> 
-	# File["/etc/init/${project_name}.conf"]-> 
-	File["/etc/init.d/${project_name}"]-> 
-	Service["${project_name}"]
+	Exec['npmInstall']
 	
-	$node_executable = $nvm_nodejs::NODE_EXEC
-
-	info("##### ---------------->>> git URI:    $git_uri")
-	info("##### ---------------->>> project name:    $project_name")
-	info("node exe: $nvm_nodejs::NODE_EXEC")
+	info("Configuring project name:    $project_name")
+	info("Using node exe: $nvm_nodejs::NODE_EXEC")
 
 }

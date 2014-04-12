@@ -15,7 +15,6 @@ class nodesite::git (
 		ensure => directory,
 	}
 
-	info("/usr/bin/git clone --depth 1 $git_uri  &>>${project_name}_gitclone.log")
 	exec { "cloneProject":
 		command => "/usr/bin/git clone --depth 1 $git_uri  &>>${project_name}_gitclone.log",
 		cwd			=> "${$repo_dir}",
