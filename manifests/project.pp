@@ -1,17 +1,18 @@
 class nodesite::project(
-		$git_uri 	 		= {},
-		$git_branch		= 'master',
-		$file_to_run	= 'app.js',
-		$node_version = {},
-		$user					= {},
-		$npm_proxy		= {},
+		$git_uri 	 		= $nodesite::git_uri,
+		$git_branch		= $nodesite::git_branch,
+		$file_to_run	= $nodesite::file_to_run,
+		$node_version = $nodesite::node_version,
+		$user					= $nodesite::user,
+		$npm_proxy		= $nodesite::npm_proxy,
+		$repo_dir 		= $nodesite::repo_dir,
 	){
 
-	$nodesite_dir = "/usr/local/share/notesite_git_projects"
+
 	# regex to get project name, used in folder
 	$project_name_dirty = regsubst($git_uri, '^(.*[\\\/])', '')
 	$project_name = regsubst($project_name_dirty, '.git', '')
-	$project_dir = "$nodesite_dir/${project_name}"
+	$project_dir = "$repo_dir/${project_name}"
 	
 	#defaults
 	Class{ user => $user }
@@ -23,14 +24,14 @@ class nodesite::project(
   	version => $node_version,
 	}
 
-	file { "${nodesite_dir}":
+	file { "${repo_dir}":
 		ensure => directory,
 	}
 
 	exec { "cloneProject":
 		command => "/usr/bin/git clone --depth 1 $git_uri  &>>${project_name}_gitclone.log",
-		cwd			=> "${$nodesite_dir}",
-		creates => "${$nodesite_dir}/${project_name}_gitclone.log",
+		cwd			=> "${$repo_dir}",
+		creates => "${$repo_dir}/${project_name}_gitclone.log",
 	}
 
 	exec { "git_branch":
@@ -89,7 +90,7 @@ class nodesite::project(
   }
 
  	Class['nvm_nodejs'] -> 
-	File["${nodesite_dir}"] -> 
+	File["${repo_dir}"] -> 
 	Exec['cloneProject'] -> 
 	Exec['git_branch'] -> 
 	Exec['pullProject'] -> 

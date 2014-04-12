@@ -1,0 +1,4 @@
+---
+nodesite::git_branch: 	'master'
+nodesite::file_to_run: 	'app.js'
+nodesite::repo_dir: 		'/usr/local/share/nodesite_repos'
