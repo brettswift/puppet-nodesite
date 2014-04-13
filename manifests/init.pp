@@ -12,12 +12,14 @@ class nodesite (
     $node_params    = undef,
 ){
 
+  include nodesite::appuser
   include nodesite::packages
 	include nodesite::git
   include nodesite::project
 
 
 
+  Class['nodesite::appuser'] ->
   Class['nodesite::packages'] ->
   Class['nodesite::git'] ->
   Class['nodesite::project']

@@ -2,24 +2,40 @@
 description "node.js server"
 author      "Brett Swift"
 
-start on startup
-stop on shutdown
-# PID_FILE=/var/run/<%=@project_name%>.pid
-expect fork
+# settings to start on RHEL?
+# start on stopped rc RUNLEVEL=[2345]
+# stop on starting runlevel [016]
 
+start on (local-filesystems and net-device-up)
+stop on shutdown
+expect fork
+kill timeout 5
 respawn
 
+export HOME=/root
+export NODE_EXEC=<%=@node_exec_dir%>/node
+export NPM_EXEC=<%=@node_exec_dir%>/npm
+export APP_DIR=<%=@repo_dir%>/<%=@project_name%>
+export NODE_ENV=production #TODO: set node_env variable, and other node variables
+export NODE_CONFIG_DIR=$APP_DIR/config
+export LOG_FILE=/var/log/<%=@project_name%>.sys.log
+export PID_FILE=/var/run/<%=@project_name%>.pid
+
+instance "Node - <%=@project_name%>"
+
 script
-    export HOME="/root"
-    export NODE_EXEC="<%=@node_exec_dir%>/node"
-    export NPM_EXEC="<%=@node_exec_dir%>/npm"
-    export APP_DIR='<%=@repo_dir%>/<%=@project_name%>'
-    export NODE_ENV=production #TODO: set node_env variable, and other node variables
-    export NODE_CONFIG_DIR=$APP_DIR/config
-    
-    echo $$ > /var/run/<%=@project_name%>.pid
-    exec 
-    exec $NODE_EXEC $APP_DIR/<%=@file_to_run%> >> /var/log/<%=@project_name%>.sys.log 2>&1
+  
+    echo $$ > $PID_FILE
+
+    echo running with: "$NODE_EXEC $APP_DIR/<%=@file_to_run%> <%=@inline_node_params %>" >> /var/log/<%=@project_name%>.sys.log
+
+    chdir $APP_DIR
+    # exec $NPM_EXEC prune
+    # exec $NPM_EXEC install
+    #TODO: use `npm start` 
+    # exec sudo -u username 
+    # exec su root -c "$NODE_EXEC $APP_DIR/<%=@file_to_run%> <%=@inline_node_params %>" >> /var/log/<%=@project_name%>.sys.log 2>&1
+    exec $NODE_EXEC $APP_DIR/<%=@file_to_run%> '<%=@inline_node_params %>' >> /var/log/uptime.sys.log 2>&1
 end script
 
 pre-start script

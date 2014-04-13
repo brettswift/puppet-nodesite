@@ -16,8 +16,10 @@ class nodesite::git (
 		ensure => directory,
 	}
 
+	#clone of depth =1, causes 'is_sycned_with_upstream' script to fail.
+	#TODO: support for tags
 	exec { "cloneProject":
-		command => "/usr/bin/git clone --depth 1 $git_uri  &>>${project_name}_gitclone.log",
+		command => "/usr/bin/git clone $git_uri  &>>${project_name}_gitclone.log",
 		cwd			=> "${$repo_dir}",
 		creates => "${$repo_dir}/${project_name}/.git/HEAD",
 	}
