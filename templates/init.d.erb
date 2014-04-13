@@ -37,7 +37,7 @@ start_app (){
         cd $APP_DIR
         $NPM_EXEC prune
         $NPM_EXEC install
-        NODE_ENV=$NODE_ENV NODE_CONFIG_DIR=$CONFIG_DIR $NODE_EXEC $APP_DIR/$NODE_APP <%=@inline_node_params %>  1>$LOG_FILE 2>&1 &
+        NODE_ENV=$NODE_ENV NODE_CONFIG_DIR=$CONFIG_DIR $NODE_EXEC $APP_DIR/$NODE_APP <%=@inline_node_params %>  1>>$LOG_FILE 2>&1 &
         echo $! > $PID_FILE;
     fi
 }

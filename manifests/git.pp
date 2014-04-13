@@ -9,7 +9,7 @@ class nodesite::git (
 	 # this code is duplicated.. fix it. 
   $project_name_dirty = regsubst($git_uri, '^(.*[\\\/])', '')
   $project_name = regsubst($project_name_dirty, '.git', '')
-  $project_dir = "$repo_dir/${project_name}"
+  $project_dir = "${repo_dir}/${project_name}"
 
 
 	file { "${repo_dir}":
@@ -28,14 +28,14 @@ class nodesite::git (
 		# TODO: notify npm purge exec.
 	}
 
-	file { "${repo_dir}/is_synced_with_upstream.sh":
+	file { "${project_dir}/is_synced_with_upstream.sh":
 		content 	=> template('nodesite/is_synced_with_upstream.sh.erb'),
 		mode 			=> '0755',
 	}
 
 	exec { "check_for_redeploy": 
-		command  	=> "echo `git log --pretty=%H ...refs/heads/${git_branch}^` > ${$repo_dir}/.cur_git_hash",
-		unless 		=> "${repo_dir}/is_synced_with_upstream.sh",
+		command  	=> "echo `git log --pretty=%H ...refs/heads/${git_branch}^` > ${project_dir}/.cur_git_hash",
+		unless 		=> "${project_dir}/is_synced_with_upstream.sh",
 		notify 		=> Exec['pullProject'],
 	}	
 
