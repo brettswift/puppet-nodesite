@@ -3,6 +3,7 @@ class nodesite::git (
 		$git_branch 	= $nodesite::git_branch,
 		$git_uri			= $nodesite::git_uri,
 	){
+	include nodesite::project
 
 	 # regex to get project name from uri, used in git and project resources
 	 # this code is duplicated.. fix it. 
@@ -27,9 +28,22 @@ class nodesite::git (
 		# TODO: notify npm purge exec.
 	}
 
+	file { "${repo_dir}/is_synced_with_upstream.sh":
+		content 	=> template('nodesite/is_synced_with_upstream.sh.erb'),
+		mode 			=> '0755',
+	}
+
+	exec { "check_for_redeploy": 
+		command  	=> "echo `git log --pretty=%H ...refs/heads/${git_branch}^` > ${$repo_dir}/.cur_git_hash",
+		unless 		=> "${repo_dir}/is_synced_with_upstream.sh",
+		notify 		=> Exec['pullProject'],
+	}	
+
 	exec { "pullProject":
-		command => "/usr/bin/git pull origin ${git_branch}",
-		cwd			=> $project_dir,
+		command 		=> "/usr/bin/git pull origin ${git_branch}",
+		cwd					=> "${project_dir}",
+		refreshonly => true,
+		notify 			=> Class["nodesite::project"],
 	}
 
 	File["${repo_dir}"] -> 

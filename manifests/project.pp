@@ -24,9 +24,6 @@ class nodesite::project(
 		# $inline_node_params = join($node_params,"-- ") future parser only
 		$inline_node_params = "--${node_params}"
 	}
-	#defaults
-	# Exec{ user => $user	}
-	# File{ owner => $user	}
 
 	class { 'nodejs':
   version      => 'stable',
@@ -61,7 +58,7 @@ class nodesite::project(
 	  $supports_upstart = false
 	}
 
-	#ugly, but early support for upstart on rhel
+	#ugly if condition, but early support for upstart on rhel
 	#TODO: move to service_35.pp and service_34?
 	if $supports_upstart {
 		info("Configuring $project_name with upstart")
