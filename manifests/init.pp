@@ -7,8 +7,9 @@ class nodesite (
     $node_version 	= {},
     $file_to_run 		= 'module_default',
     $user           = {},
-    $npm_proxy      = {},
+    $npm_proxy      = '',
     $repo_dir       = 'module_default',
+    $node_params    = undef,
 ){
 
   include nodesite::packages

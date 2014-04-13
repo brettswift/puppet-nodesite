@@ -11,4 +11,8 @@ class nodesite::packages{
     ensure => latest,
   }
 
+  package{'gcc-c++':
+		ensure => latest,
+	}
+
 }

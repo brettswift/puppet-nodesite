@@ -6,40 +6,54 @@ class nodesite::project(
 		$user					= $nodesite::user,
 		$npm_proxy		= $nodesite::npm_proxy,
 		$repo_dir 		= $nodesite::repo_dir,
+		$node_params 	= $nodesite::node_params,
 	){
 
+	# TODO: validate node version to: vX.X.X or latest or stable
+	# validate_re($node_version, '^one$')
 
 	# regex to get project name from uri, used in git and project resources
   $project_name_dirty = regsubst($git_uri, '^(.*[\\\/])', '')
   $project_name = regsubst($project_name_dirty, '.git', '')
   $project_dir = "$repo_dir/${project_name}"
 
+  #set by willdurand/nodejs module
+  $node_exec_dir = '/usr/local/node/node-default/bin'
 	
+	if $node_params{
+		# $inline_node_params = join($node_params,"-- ") future parser only
+		$inline_node_params = "--${node_params}"
+	}
 	#defaults
-	Class{ user => $user }
-	Exec{ user => $user	}
-	File{ owner => $user	}
+	# Exec{ user => $user	}
+	# File{ owner => $user	}
 
-	class { 'nvm_nodejs':
-  	user    => $user,
-  	version => $node_version,
+	class { 'nodejs':
+  version      => 'stable',
+  make_install => false,
 	}
 
+	package { 'node-gyp':
+  	provider => npm
+	}
+ 	
+ 	# TODO: support proxy
 	if($npm_proxy){
 		exec { "setNpmProxy": 
-			command 		=> "$nvm_nodejs::NPM_EXEC config set https-proxy $npm_proxy; $nvm_nodejs::NPM_EXEC config set proxy ${npm_proxy}",
+			command 		=> "${node_exec_dir}/npm config set https-proxy $npm_proxy; ${node_exec_dir}/npm config set proxy ${npm_proxy}",
 			onlyif			=> "/bin/echo $http_proxy",
 			user 				=> 'root',
-			notify 			=> Exec['npmInstall'],
 		}
 	}
 
 	#TODO take deployment commands from package.json, not just npm install.
-	exec { "npmInstall":
-		command => "$nvm_nodejs::NPM_EXEC install",
-		cwd			=> $project_dir,
-		user 		=> 'root', #TODO: not as root. 
-	}
+	# npm install moved to init startup scripts
+	# exec { "npmInstall":
+	# 	# command => "$nvm_nodejs::NPM_EXEC install",
+	# 	command => "${node_exec_dir}/npm install",
+	# 	cwd			=> $project_dir,
+	# 	user 		=> 'root', #TODO: not as root. 
+	# }
 
 	if $::puppetversion >= '3.5.0' {
 	  $supports_upstart = true
@@ -86,6 +100,5 @@ class nodesite::project(
   }
 	
 	info("Configuring project name:    $project_name")
-	info("Using node exe: $nvm_nodejs::NODE_EXEC")
 
 }
