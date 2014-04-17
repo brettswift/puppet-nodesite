@@ -24,10 +24,10 @@ class nodesite::project(
 		# $inline_node_params = join($node_params,"-- ") future parser only
 		$inline_node_params = "--${node_params}"
 	}
-
+	
 	class { 'nodejs':
-  version      => 'stable',
-  make_install => false,
+	  version      => 'stable',
+	  make_install => false,
 	}
 
 	package { 'node-gyp':
