@@ -1,14 +1,17 @@
 #Nodesite
+
+State: experimental
+
 A Puppet module to allow fast deployment to test nodejs applications.
 
-Pass in your .git URI and the file used to run your app (if it's something other than app.js).   
-Pass your database configuration in via `node_params` (that will be passed to the command line) or optionally put configuration into a git branch of your source project, and tell nodesite which `git_branch` to run. 
+Pass in your .git URI and the file used to run your app (if it's something other than app.js).
+Pass your database configuration in via `node_params` (that will be passed to the command line) or optionally put configuration into a git branch of your source project, and tell nodesite which `git_branch` to run.
 
-If the DB configuration is successful, you will have a running nodejs app. 
+If the DB configuration is successful, you will have a running nodejs app.
 
 Typically you will configure a database on the same host.  To see an example of this module in action,  see my [vagrant-nodeJsServer](https://github.com/brettswift/vagrant-nodeJsServer) project
 
-###Git deploys 
+###Git deploys
 Enabled by default.  Nodesite will check for upstream changes on each puppet run.  If there are any it will run a `git pull`, `npm prune`, `npm install` and restart the service.
 
 
@@ -36,7 +39,7 @@ with all defaults
 
 ###Parameters
 
-* **node_version** - optional. 
+* **node_version** - optional.
   * default: 'stable'
 * **git_uri** - required
   * use link as shown above.
@@ -54,12 +57,12 @@ with all defaults
   * default: `/usr/local/share/nodesite_repos`
 
 ## TODO (6)
-1. git.pp:9  this code is duplicated.. fix it. 
-2. init.pp:1  unit tests! 
+1. git.pp:9  this code is duplicated.. fix it.
+2. init.pp:1  unit tests!
 3. project.pp:12  validate node version to: vX.X.X or latest or stable
 4. project.pp:61  pull start scripts into separate files
 5. init.conf.erb:19  set node_env variable, and other node variables
-6. init.conf.erb:35  use `npm start` 
+6. init.conf.erb:35  use `npm start`
 
 
 ##Known Bugs

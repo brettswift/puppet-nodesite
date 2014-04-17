@@ -5,19 +5,19 @@ class nodesite::packages{
         ensure => latest,
     }
   }
-  
+
   if ! defined(Package['git']) {
     package { 'git':
         ensure => latest,
     }
   }
-  
+
   if ! defined(Package['curl']) {
     package { 'curl':
         ensure => latest,
     }
   }
-  
+
   if ! defined(Package['gcc-c++']) {
     package { 'gcc-c++':
         ensure => latest,
