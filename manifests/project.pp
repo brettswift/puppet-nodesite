@@ -45,12 +45,12 @@ class nodesite::project(
 
 	#TODO take deployment commands from package.json, not just npm install.
 	#npm install moved to init startup scripts
-	exec { "npmInstall":
-		# command => "$nvm_nodejs::NPM_EXEC install",
-		command => "${node_exec_dir}/npm install",
-		cwd			=> $project_dir,
-		# user 		=> 'root', #TODO: not as root. 
-	}
+	# exec { "npmInstall":
+	# 	# command => "$nvm_nodejs::NPM_EXEC install",
+	# 	command => "${node_exec_dir}/npm install",
+	# 	cwd			=> $project_dir,
+	# 	# user 		=> 'root', #TODO: not as root. 
+	# }
 
 	if $::puppetversion >= '3.5.0' {
 	  $supports_upstart = true
