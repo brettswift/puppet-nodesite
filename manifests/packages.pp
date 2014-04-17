@@ -1,18 +1,26 @@
 class nodesite::packages{
-  package{"make":
-    ensure => latest,
+
+  if ! defined(Package['make']) {
+    package { 'make':
+        ensure => latest,
+    }
   }
-
-  package{"git":
-    ensure => latest,
+  
+  if ! defined(Package['git']) {
+    package { 'git':
+        ensure => latest,
+    }
   }
-
-  package{"curl":
-    ensure => latest,
+  
+  if ! defined(Package['curl']) {
+    package { 'curl':
+        ensure => latest,
+    }
   }
-
-  package{'gcc-c++':
-		ensure => latest,
-	}
-
+  
+  if ! defined(Package['gcc-c++']) {
+    package { 'gcc-c++':
+        ensure => latest,
+    }
+  }
 }

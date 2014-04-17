@@ -14,8 +14,8 @@ class nodesite::project(
 
 	# regex to get project name from uri, used in git and project resources
   $project_name_dirty = regsubst($git_uri, '^(.*[\\\/])', '')
-  $project_name = regsubst($project_name_dirty, '.git', '')
-  $project_dir = "$repo_dir/${project_name}"
+  $project_name 			= regsubst($project_name_dirty, '.git', '')
+  $project_dir 				= "$repo_dir/${project_name}"
 
   #set by willdurand/nodejs module
   $node_exec_dir = '/usr/local/node/node-default/bin'
@@ -34,7 +34,6 @@ class nodesite::project(
   	provider => npm
 	}
  	
- 	# TODO: support proxy
 	if($npm_proxy){
 		exec { "setNpmProxy": 
 			command 		=> "${node_exec_dir}/npm config set https-proxy $npm_proxy; ${node_exec_dir}/npm config set proxy ${npm_proxy}",
@@ -49,7 +48,7 @@ class nodesite::project(
 	# 	# command => "$nvm_nodejs::NPM_EXEC install",
 	# 	command => "${node_exec_dir}/npm install",
 	# 	cwd			=> $project_dir,
-	# 	# user 		=> 'root', #TODO: not as root. 
+	# 	# user 		=> 'root', ...? not as root. 
 	# }
 
 	if $::puppetversion >= '3.5.0' {
@@ -59,7 +58,7 @@ class nodesite::project(
 	}
 
 	#ugly if condition, but early support for upstart on rhel
-	#TODO: move to service_35.pp and service_34?
+	#TODO: pull start scripts into separate files
 	if $supports_upstart {
 		info("Configuring $project_name with upstart")
 		file {"/etc/init/${project_name}.conf":
