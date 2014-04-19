@@ -22,7 +22,7 @@ class nodesite::project(
 
   if $node_params {
     # $inline_node_params = join($node_params,"-- ") future parser only
-    $inline_node_params = "--${node_params}"
+    $inline_node_params = "'--${node_params}'"
   }
 
   class { 'nodejs' :
@@ -53,44 +53,17 @@ class nodesite::project(
   #   # user     => 'root', ...? not as root.
   # }
 
-  if $::puppetversion >= '3.5.0' {
-    $supports_upstart = true
-  } else {
-    $supports_upstart = false
+  file {"/etc/init.d/${project_name}":
+    content  => template('nodesite/init.d.erb'),
+    mode     => '0755',
   }
 
-  # ugly if condition, but early support for upstart on rhel
-  # TODO: pull start scripts into separate files
-  if $supports_upstart {
-    info("Configuring ${project_name} with upstart")
-    file {"/etc/init/${project_name}.conf":
-      content  => template('nodesite/init.conf.erb'),
-      mode     => '0644',
-    }
-
-    service { $project_name:
-      ensure     => running,
-      provider   => upstart,
-    }
-
-    File["/etc/init/${project_name}.conf"]->
-    Service[$project_name]
-
-
-  } else {
-    info("Configuring ${project_name} with sysv ")
-    file {"/etc/init.d/${project_name}":
-      content  => template('nodesite/init.d.erb'),
-      mode     => '0755',
-    }
-
-    service { $project_name:
-      ensure => running,
-    }
-
-    File["/etc/init.d/${project_name}"]->
-    Service[$project_name]
+  service { $project_name:
+    ensure => running,
   }
+
+  File["/etc/init.d/${project_name}"]->
+  Service[$project_name]
 
   service { 'iptables':
     ensure => stopped,
