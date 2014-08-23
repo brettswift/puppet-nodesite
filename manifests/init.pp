@@ -1,4 +1,14 @@
 # TODO: unit tests!
+# TODO: documentation
+# yaml_entries should be in the format: 
+
+
+#   $key_pairs = {
+#     "value/animal/type" => { value => 'donkey'   },
+#     "value/animal/name" => { value => 'ee-ore'   },
+#     "value/animal/colors" => { value => ['grey','black','white', {'painted' => ['red','blue']}]   },
+#   }
+
 Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ] }
 
 class nodesite (

@@ -9,13 +9,6 @@ class nodesite::project(
     $yaml_entries  = $nodesite::yaml_entries,
   ){
 
-
-  $key_pairs = {
-    "value/animal/type" => { value => 'donkey'   },
-    "value/animal/name" => { value => 'ee-ore'   },
-    "value/animal/colors" => { value => ['grey','black','white', {'painted' => ['red','blue']}]   },
-  }
-
   # TODO: validate node version to: vX.X.X or latest or stable
   # validate_re($node_version, '^one$')
 
@@ -60,7 +53,7 @@ class nodesite::project(
     mode     => '0755',
   }
 
-  
+
   if($yaml_entries){
     class {'nodesite::project_config':
       yaml_entries => $yaml_entries,
