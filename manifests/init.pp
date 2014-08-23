@@ -9,7 +9,8 @@ class nodesite (
     $user           = {},
     $npm_proxy      = '',
     $repo_dir       = 'module_default',
-    $node_params    = undef,
+    $yaml_file      = undef,  #relative path from git project root.
+    $yaml_entries   = undef,
 ){
 
   include nodesite::appuser
