@@ -6,6 +6,7 @@ class nodesite::project(
     $user          = $nodesite::user,
     $npm_proxy     = $nodesite::npm_proxy,
     $repo_dir      = $nodesite::repo_dir,
+    $yaml_file     = $nodesite::yaml_file,
     $yaml_entries  = $nodesite::yaml_entries,
   ){
 
@@ -56,10 +57,15 @@ class nodesite::project(
 
   if($yaml_entries){
     class {'nodesite::project_config':
-      yaml_entries => $yaml_entries,
+      yaml_entries  => $yaml_entries,
+      yaml_file     => "${project_dir}/${yaml_file}",
     }
+    
+    anchor { 'nodesite::project_config::start': }->
     Class['nodesite::project_config']->
-    Service[$project_name]
+    Service[$project_name]-> 
+    anchor { 'nodesite::project_config::end': }
+
   }
   
 
