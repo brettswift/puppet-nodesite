@@ -1,10 +1,12 @@
+#Private Class - do not call outside nodesite directly. 
+
 class nodesite::project_config (
-		$yaml_file	 	= $nodesite::yaml_file,
+		$yaml_file	 	= undef,
 		$yaml_entries	= $nodesite::yaml_entries,
 	){
-	$config_file = "{$nodesite::project_dir}/${yaml_file}"
 
 	define config_settings ($value) {
+		$config_file = "${nodesite::project_config::yaml_file}"
 	  notify { "${title}":
 	    message => "Setting configuration: ${title}:  ${value}\n",
 	  }
@@ -16,6 +18,6 @@ class nodesite::project_config (
 	  }
 	}
 
-	create_resources(config_settings, $key_pairs)
+	create_resources(config_settings, $yaml_entries)
 
 }
