@@ -1,11 +1,19 @@
 {
+  "name": "brettswift-nodesite",
+  "version": "0.0.3",
+  "author": "Brett Swift",
+  "summary": "Nodejs web app deployments",
+  "license": "MIT",
+  "source": "git://github.com/brettswift/puppet-nodesite",
+  "project_page": "http://github.com/brettswift/puppet-nodesite",
+  "issues_url": "https://github.com/brettswift/puppet-nodesite/issues",
   "operatingsystem_support": [
     {
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
         "6"
       ]
-    },
+    }
   ],
   "requirements": [
     {
@@ -13,14 +21,7 @@
       "version_requirement": "3.x"
     }
   ],
-  "name": "brettswift-nodesite",
-  "version": "0.0.1",
-  "source": "git://github.com/brettswift/puppet-nodesite",
-  "author": "Brett Swift",
-  "license": "MIT",
-  "summary": "Nodejs web app deployments",
   "description": "Nodejs module for deploying nodejs applications via git.",
-  "project_page": "http://github.com/brettswift/puppet-nodesite",
   "dependencies": [
     {
       "name": "puppetlabs/stdlib",
@@ -38,22 +39,5 @@
       "name": "willdurand/nodejs",
       "version_requirement": ">=v1.6.3"
     }
-  ],
-  "types": [
-
-  ],
-  "checksums": {
-    "Modulefile": "110af9e9ef0080274e4e9fc6fb252651",
-    "README.md": "c3e2a82724bea94761c10708d93c648c",
-    "data/common.yaml": "5c2b71eb8d74ca6d30f984f3260aeb23",
-    "data/hiera.yaml": "07af578946a36bb6809a9b7ba41e8bb5",
-    "manifests/appuser.pp": "43d0fdc21988904ab209d550e36a8b03",
-    "manifests/git.pp": "80bc4c4852d8d6305ced314db67bc7ff",
-    "manifests/init.pp": "064de36b9a5d087b2c1621c2222711c2",
-    "manifests/packages.pp": "18eb339c95df6b4d44b39f50750914a7",
-    "manifests/project.pp": "f83c2889b888211195dac810a83e0d04",
-    "templates/init.conf.erb": "170c34772acb15fe96249ccf2a64d555",
-    "templates/init.d.erb": "d65cb2250c18f33ace160875e4fd9c2a",
-    "templates/is_synced_with_upstream.sh.erb": "73fa0f89db52d691d3cca624045b9408"
-  }
+  ]
 }
