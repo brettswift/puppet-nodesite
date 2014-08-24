@@ -1,9 +1,9 @@
-class project_config (
+class nodesite::project_config (
 		$yaml_file	 	= $nodesite::yaml_file,
 		$yaml_entries	= $nodesite::yaml_entries,
 	){
 	$config_file = "{$nodesite::project_dir}/${yaml_file}"
-	
+
 	define config_settings ($value) {
 	  notify { "${title}":
 	    message => "Setting configuration: ${title}:  ${value}\n",
