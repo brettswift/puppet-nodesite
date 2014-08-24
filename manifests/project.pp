@@ -6,7 +6,7 @@ class nodesite::project(
     $user          = $nodesite::user,
     $npm_proxy     = $nodesite::npm_proxy,
     $repo_dir      = $nodesite::repo_dir,
-    $node_params   = $nodesite::node_params,
+    $yaml_entries  = $nodesite::yaml_entries,
   ){
 
   # TODO: validate node version to: vX.X.X or latest or stable
@@ -19,11 +19,6 @@ class nodesite::project(
 
   # set by willdurand/nodejs module
   $node_exec_dir = '/usr/local/node/node-default/bin'
-
-  if $node_params {
-    # $inline_node_params = join($node_params,"-- ") future parser only
-    $inline_node_params = "'--${node_params}'"
-  }
 
   class { 'nodejs' :
     version      => 'stable',
@@ -57,6 +52,16 @@ class nodesite::project(
     content  => template('nodesite/init.d.erb'),
     mode     => '0755',
   }
+
+
+  if($yaml_entries){
+    class {'nodesite::project_config':
+      yaml_entries => $yaml_entries,
+    }
+    Class['nodesite::project_config']->
+    Service[$project_name]
+  }
+  
 
   service { $project_name:
     ensure => running,
