@@ -3,7 +3,7 @@
   "version": "0.0.3",
   "author": "Brett Swift",
   "summary": "Nodejs web app deployments",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "source": "git://github.com/brettswift/puppet-nodesite",
   "project_page": "http://github.com/brettswift/puppet-nodesite",
   "issues_url": "https://github.com/brettswift/puppet-nodesite/issues",

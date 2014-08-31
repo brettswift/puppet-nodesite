@@ -1,0 +1,17 @@
+fixtures:
+    symlinks:
+      "nodesite": "#{source_dir}"
+    repositories:
+      nodejs: 
+        repo: "git://github.com/willdurand/puppet-nodejs"
+        ref:  "1.6.3"
+    forge_modules:
+      stdlib:
+        repo: "puppetlabs/stdlib"
+        ref:  "2.6.0"
+      git: 
+        repo: "example42/git"
+        ref: "2.0.15"
+      module_data:
+        repo: "ripienaar/module_data"
+        ref: "0.0.3"
