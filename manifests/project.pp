@@ -1,13 +1,13 @@
 class nodesite::project(
-    $git_uri       = $nodesite::git_uri,
-    $git_branch    = $nodesite::git_branch,
-    $file_to_run   = $nodesite::file_to_run,
-    $node_version  = $nodesite::node_version,
-    $user          = $nodesite::user,
-    $npm_proxy     = $nodesite::npm_proxy,
-    $repo_dir      = $nodesite::repo_dir,
-    $yaml_file     = $nodesite::yaml_file,
-    $yaml_entries  = $nodesite::yaml_entries,
+    $git_uri      = $nodesite::git_uri,
+    $git_branch   = $nodesite::git_branch,
+    $file_to_run  = $nodesite::file_to_run,
+    $node_version = $nodesite::node_version,
+    $user         = $nodesite::user,
+    $npm_proxy    = $nodesite::npm_proxy,
+    $repo_dir     = $nodesite::repo_dir,
+    $yaml_file    = $nodesite::yaml_file,
+    $yaml_entries = $nodesite::yaml_entries,
   ){
 
   # TODO: validate node version to: vX.X.X or latest or stable
@@ -34,9 +34,9 @@ class nodesite::project(
   $http_proxy_cmd  = "${node_exec_dir}/npm config set proxy ${npm_proxy}"
   if($npm_proxy){
     exec { 'setNpmProxy':
-      command     => "${https_proxy_cmd}; ${http_proxy_cmd};",
-      onlyif      => "/bin/echo ${::http_proxy}",
-      user        => 'root',
+      command => "${https_proxy_cmd}; ${http_proxy_cmd};",
+      onlyif  => "/bin/echo ${::http_proxy}",
+      user    => 'root',
     }
   }
 
@@ -50,24 +50,24 @@ class nodesite::project(
   # }
 
   file {"/etc/init.d/${project_name}":
-    content  => template('nodesite/init.d.erb'),
-    mode     => '0755',
+    content => template('nodesite/init.d.erb'),
+    mode    => '0755',
   }
 
 
   if($yaml_entries){
     class {'nodesite::project_config':
-      yaml_entries  => $yaml_entries,
-      yaml_file     => "${project_dir}/${yaml_file}",
+      yaml_entries => $yaml_entries,
+      yaml_file    => "${project_dir}/${yaml_file}",
     }
-    
+
     anchor { 'nodesite::project_config::start': }->
     Class['nodesite::project_config']->
-    Service[$project_name]-> 
+    Service[$project_name]->
     anchor { 'nodesite::project_config::end': }
 
   }
-  
+
 
   service { $project_name:
     ensure => running,
