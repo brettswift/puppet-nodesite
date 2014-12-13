@@ -26,10 +26,9 @@ Vagrant.configure("2") do |config|
       puppet.manifest_file       = "base.pp"
       puppet.hiera_config_path   = "vagrant/hiera.yaml"
       puppet.working_directory   = "/tmp/vagrant-puppet-2/manifests"
-      puppet.options             = ["--modulepath=/tmp/modules:/vagrant/modules:/etc/puppetlabs/puppet/modules",
+      puppet.options             = ["--modulepath=/tmp/modules:/vagrant/modules:/vagrant/spec/fixtures/modules:/etc/puppetlabs/puppet/modules",
                                     "--verbose",
                                     "--trace"]
     end
-
   end
 end

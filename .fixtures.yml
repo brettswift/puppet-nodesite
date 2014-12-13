@@ -1,0 +1,20 @@
+fixtures:
+  symlinks:
+    nodesite: '#{source_dir}'
+  forge_modules:
+      firewall: "puppetlabs/firewall"
+      stdlib:
+          repo: "puppetlabs/stdlib"
+          ref: "3.2.0"
+      git:
+          repo: "example42/git"
+          ref:  "2.0.x"
+      module_data:
+          repo: "ripienaar/module_data"
+          ref:  "0.0.3"
+      nodejs:
+          repo: "willdurand/nodejs"
+          ref:  "1.8.4"
+      wget:
+          repo: "maestrodev/wget"
+          ref:  "1.5.6"
