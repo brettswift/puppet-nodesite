@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+command -v bundle >/dev/null 2>&1 || { echo >&2 "I require bundle but it's not installed.  Aborting."; exit 1; }
+
+cd $(dirname "$0")/..
+
+BUNDLE=.bundle
+
+SCRIPT=$(basename "$0")
+
+BUNDLE_ARGS="--path $BUNDLE --quiet"
+[ "cibuild" = "$SCRIPT" ] && BUNDLE_ARGS="$BUNDLE_ARGS --no-quiet"
+
+#1. bundle!
+rm -rf {$BUNDLE/config}
+bundle install $BUNDLE_ARGS
+
+#2. run shim to rake task.
+bundle exec rake $SCRIPT
+
+#3. tell puny human we're done
+echo "\nBundle install succeeded, rake target: $SCRIPT succeeded"
