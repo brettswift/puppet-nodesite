@@ -1,6 +1,18 @@
 ---
+#TODO: support multi-npm with a hiera api similar to:
 # nodesite::profiles::npm::sites:
 #   'slackin':
 #     'options': '-i 30000 -t token'
 nodesite::profiles::npm::npm_package:     "slackin"
 nodesite::profiles::npm::package_options: "-p 8080 -i 5000 shawdevops xoxp-13035057553-13032595168-13483827825-49a38b33b6"
+
+
+nodesite::profiles::git::git_uri: "https://github.com/brettswift/uptime.git"
+
+
+#   node_version => "v0.10.26",
+#   git_uri      => "https://github.com/brettswift/uptime.git",
+#   git_branch   => $featureBranch,
+#   file_to_run  => "app.js",
+#   user         => "${project}",
+#   # node_params  => "NODE_CONFIG={\"mongodb\":{\"database\":${db_name}, \"user\":${db_user}, \"password\":${db_password}}}"

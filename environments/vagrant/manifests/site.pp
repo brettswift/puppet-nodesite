@@ -1,6 +1,7 @@
 
 
 include 'nodesite::profiles::npm'
+include 'nodesite::profiles::git'
 
 
 # $featureBranch = 'versionChecks'

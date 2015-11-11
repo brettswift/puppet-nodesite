@@ -24,18 +24,6 @@ class nodesite (
 ){
 
   if $caller_module_name != $module_name {
-    fail("Use of private class ${name} by ${caller_module_name}")
+    fail("Nodesite is a private class. Use one of the Nodesite::Profile classes instead.  You called: ${name} from ${caller_module_name}")
   }
-  include nodesite::appuser
-  include nodesite::packages
-  include nodesite::git
-  include nodesite::project
-
-
-
-  Class['nodesite::appuser'] ->
-  Class['nodesite::packages'] ->
-  Class['nodesite::git'] ->
-  Class['nodesite::project']
-
 }

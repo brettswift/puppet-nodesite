@@ -30,6 +30,7 @@ Vagrant.configure("2") do |config|
       # puppet.working_directory   = "/tmp/vagrant-puppet-2/manifests"
       puppet.options             = ["--modulepath=/tmp/modules:/vagrant/spec/fixtures/modules:/etc/puppetlabs/puppet/modules",
                                     # "--debug",
+                                    # "--trace",
                                     "--verbose"]
     end
   end

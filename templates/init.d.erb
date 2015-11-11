@@ -33,7 +33,7 @@ start_app (){
     else
         echo "Starting <%=@project_name%> app..."
         #TODO test functionality for port
-        #PORT=$PORT 
+        #PORT=$PORT
         cd $APP_DIR
         $NPM_EXEC prune
         $NPM_EXEC install
@@ -72,7 +72,7 @@ case "$1" in
     ;;
 
     status)
-           
+
      if [ -f $PID_FILE ]; then
         echo "pid file exists"
         PID=`cat $PID_FILE`
